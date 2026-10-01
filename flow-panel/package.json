@@ -1,0 +1,30 @@
+{
+  "name": "dsh-harness-flow",
+  "description": "驾驭工程模式流程面板（可选组件）：会话顶栏入口，显示项目总目标 / 当前对话目标 / 可自选线路的循环流程图；模型经 harness_flow 工具同步阶段推进，用户点节点/回路切换线路。仅 harness（驾驭工程模式）preset 会话显示面板。纯提示词运行不需要本插件；面板不拦截任何工具调用。",
+  "version": "0.15.2",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "README.md",
+    "cordis.patch.yml"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "engines": {
+      "dsh": ">=0.1.5-rc.1 || >=0.2.0-rc"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

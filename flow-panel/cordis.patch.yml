@@ -1,0 +1,8 @@
+# dsh-harness-flow 的 bundle 声明（v0.15.1 起）
+# 作用：让面板可以通过 plugin_manager（桌面端「插件 → 添加插件」）直接安装——
+# 此前面板只能手工挂 profile patch（npm web 的 profiles/web/cordis.patch.yml 行 +
+# node_modules link），桌面端用户无从装起。bundle 化后两个世代统一安装入口。
+# 注意：npm web 老安装方式（手工 patch 行）与本 bundle 二选一，同时挂会重复注册。
+- insert:
+    - id: harness-flow-panel
+      name: 'dsh-harness-flow'
