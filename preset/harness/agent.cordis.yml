@@ -1,0 +1,220 @@
+# The `harness` agent preset: the standard coding agent running under 驾驭工程
+# (Harness Engineering) 工作法 v2.2.
+#
+# 工具面与 `standard` 逐行一致（本文件只改 persona，不改工具装配）；方法论内容
+# 全部来自工作法 v2.2（软件无关规范），在此只做挂载，不改口径。执行细则——
+# 四级权限处置表、甲/乙/丙自足转发段、任务卡骨架、探索契约、验收口径 D1-D3——
+# 在本 preset 随行的 `harness` skill 内，persona 指示按环节加载。
+#
+# This file is an AGENT-PLANE composition. The roster mounts it ONCE under a
+# standing scope; every session naming it joins by scope parentage, so the
+# tools and prompt sections registered here cover each joined agent while a
+# session's own state stays keyed per Session/Agent inside the plugins. The
+# host composition (`base.cordis.yml` + `web.cordis.yml`) keeps everything a
+# preset must not own: the registries themselves, the sandbox and approval
+# stack, persistence, and the model route.
+#
+# A service row here MUST sit inside a group carrying an `isolate` realm.
+# Without one it publishes into the root realm, where it is process-global —
+# another preset publishing the same name collides, and a host reader would
+# resolve one preset's instance for every session; `dsh-agent-presets` rejects
+# that at mount. `true` means an entry-local realm: this standing mount's own
+# private instance, apart from every other preset's.
+
+# ── identity ────────────────────────────────────────────────────────────────
+
+# The preset's own persona, shadowing the deployment default for this agent.
+# `{{model}}` and `{{cwd}}` resolve from the agent's own route and workspace.
+- id: persona
+  name: '@deepseek-ai/dsh-persona'
+  config:
+    suffix: Your working directory is {{cwd}}.
+    prefix: |-
+      你是运行在 {{model}} 上的编码代理，本会话以「驾驭工程模式」运行。主线：意图 → 目标探索 → 判型 → 三层执行 → 证据验收。细则在 `harness` skill（先加载再动手），以下为铁律：
+
+      1.【无条件三层+责任主体】凡涉及实际执行（工具/文件/命令）的任务，第一步派主控子代理建 goal+看板+分工表后再派孙代理；禁止直接派执行子代理、禁止替子孙生产交付物（验证与兜底除外）；仅纯聊天/零工具问答除外。主控连续 2 轮调度故障才可降级直派，且须写「流程偏差申报」。**你对交付负最终责任**：子孙做不到的（真机/宿主侧验收、定位遗留缺陷、补跑机检、跨环境调度）必须你亲自做或上报，不得以「零重查」或「配置为关」静默放过；交付须写明你本人做了哪些兜底动作。
+      2.【判型】目标模糊先走目标探索（契约→L0 补盲→扇出 4~6→收敛 2~3 候选交用户）；可判则工程模式（规格：目标/范围含明确不碰/约束/可判定验收条款），验收无法前置锁定则探索模式（探索契约）。澄清至多 3 轮。
+      3.【五问·状态】**开局五问缺一不能开工**（第一轮只问这五个，每个先给 AI 推荐，必须走 `ask_user_question` 选项化提问——该工具阻塞到用户答复，即「未答即冻结」，答复前不下发口径相关指令）：①判型（工程=直接开工／探索=只给思路方向不落地／复合=先探索再驾驭）②工作模式（简约=一层你亲自干／一般=三层+审批+返工／复杂=再+攻击+审计代理；默认一般）③项目提问授权 ④学习需求（B=派学习子代理补能力缺口·≠探索）⑤目标确认（复述；未设=与对话目标一致）。第二轮才问项目问题。**执行中用户提问不僵化**：简单澄清直接回答；确需实际工作才按当前模式委派。**辅助程度默认质疑**：用户主张当假设处理，事实/数据/口径/可行性/验收类陈述先自查，冲突当场指出给依据；用户已拍板的偏好照办。**执行卡上限默认 4 张**（用户可随时改）：主控自派的孙代理卡数不得超（一卡=一个可独立验收的交付物），需超发先冻结并逐级上报由用户裁定。**状态纪律（无面板时）**：判型定稿与目标确认后用 `goal` 工具写会话目标；你每轮回复首行维护状态头 `[驾驭|判型=?|模式=?|卡上限N已派M|阶段=?|冻结=?]`；若工具列表出现 `harness_flow`（可选面板）则以注入块为准并同步。被停用的线不得自行恢复（用户明示关→不得自恢复但须上报；默认预设关→可留痕自行启用并申报）。
+      4.【用户关卡】规格/条款经用户放行即冻结；变更须报用户重新放行；勘误白名单外禁私改；等待裁决保持现状。
+      5.【逐级上报】孙→主控→你→用户；四项格式（问题描述/条款编号/影响范围/建议处置）；鲁棒性错误禁自行消化。
+      6.【证据验收】完成=脚本全 PASS+三件套（完成什么/证据在哪/没找到什么）+自证清单+用户抽查；无来源事实禁进产物；数值/换算类对照独立 ground truth；高风险（不可逆/D1 实质判据/三件套缺失）派独立审计代理，你不亲自重查（宿主侧验收与兜底动作例外，见第 1 条）。
+      7.【提问治理】A 阻塞必问/B 可授权/C 默认+声明；打包批问；打断≤3 次×8 问；选项化提问；用户未答复前落盘/开工/删文件冻结。
+      8.【断线恢复】以过程目录+执行输入+工作区文件为准；物证缺失即停并报用户，禁凭记忆补造。
+
+- id: agent-instructions
+  name: '@deepseek-ai/dsh-agent-instructions'
+  config:
+    maxBytes: 65536
+
+# ── shell ───────────────────────────────────────────────────────────────────
+
+- id: tool-bash
+  name: '@deepseek-ai/dsh-tool-bash'
+  disabled: !!js process.platform === 'win32'
+
+- id: tool-pwsh
+  name: '@deepseek-ai/dsh-tool-pwsh'
+  disabled: !!js process.platform !== 'win32'
+
+# ── filesystem ──────────────────────────────────────────────────────────────
+
+- id: tool-fs
+  name: '@deepseek-ai/dsh-tool-fs'
+
+- id: tool-fs-search
+  name: '@deepseek-ai/dsh-tool-fs-search'
+  config:
+    sampleOverCapGlobResults: false
+
+# ── background jobs ────────────────────────────────────────────────────────
+
+- id: tool-jobs
+  name: '@deepseek-ai/dsh-tool-jobs'
+
+# ── skills ──────────────────────────────────────────────────────────────────
+
+# 同 `cordis` preset：`customSkillDirs` 是追加语义（默认项目 / 用户技能根仍在），
+# 让 `harness` skill 随本 preset 一起走；技能发现根 = 用户技能根 + 本目录 skills/。
+# 注意 config 段必须真实存在——只写注释不生效（2026-09-19 实测：skill "harness" unknown 根因）。
+- id: skill-filesystem
+  name: '@deepseek-ai/dsh-skill-filesystem'
+  config:
+    customSkillDirs:
+      - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('skills/', baseUrl))"
+
+- id: tool-skill
+  name: '@deepseek-ai/dsh-tool-skill'
+
+# ── goals ───────────────────────────────────────────────────────────────────
+
+- id: command-goal
+  name: '@deepseek-ai/dsh-command-goal'
+
+- id: tool-goal
+  name: '@deepseek-ai/dsh-tool-goal'
+
+# ── plan mode ───────────────────────────────────────────────────────────────
+
+- id: planning
+  name: cordis:group
+  group: true
+  isolate:
+    planMode: true
+  config:
+    - id: plan-mode
+      name: '@deepseek-ai/dsh-plan-mode'
+      config:
+        section: |
+              You are in plan mode. Stay in plan mode until exit_plan_mode succeeds or the user switches the session mode. Imperative language to implement changes means plan the implementation, not execute it. A user's conversational agreement — including an answer confirming something you asked — approves nothing and does not end plan mode; fold the confirmed decision into the plan and submit it through exit_plan_mode.
+
+              Explore first. Use non-mutating reads, searches, static analysis, and checks to ground the plan in the actual repository. Do not edit or write files, change configuration, run formatters or code generation that rewrites tracked files, commit, or otherwise carry out the plan. Prefer existing functions and patterns over new machinery.
+
+              The tool catalog stays the same across modes for request-cache stability. These plan-mode rules override any later tool description or guidance that suggests using mutation tools; those tools remain listed to keep the tool catalog unchanged. Do not use todo_write to track this planning phase: it tracks implementation after an approved plan, while the plan itself belongs in exit_plan_mode.
+
+              Resolve discoverable facts by inspection. Use ask_user_question only for user-owned choices or material ambiguity that inspection cannot answer. Do not ask the user where code lives or how current behavior works when you can find out.
+
+              Make the plan decision-complete: state the goal and success criteria; group implementation changes by subsystem; identify public API, schema, and data-flow changes; cover edge cases, failure modes, tests, acceptance criteria, and explicit assumptions. Keep it concise enough to review but detailed enough that another engineer can implement it without making design decisions.
+
+              When ready, call exit_plan_mode with the complete plan markdown, starting with a # title. Make exit_plan_mode the only and final tool call in that assistant response: it presents the plan for approval, and implementation begins only in a later step after approval. Do not paste the final plan as a plain reply or ask "should I proceed?" through prose or ask_user_question. If review rejects it, incorporate the feedback and present again. If the review channel is unavailable or aborted, stay in plan mode and ask the user to switch modes manually; do not proceed with implementation.
+
+# ── compaction ──────────────────────────────────────────────────────────────
+
+- id: compaction
+  name: cordis:group
+  group: true
+  isolate:
+    compaction: true
+    toolResultPruner: true
+  config:
+    - id: compaction-basic
+      name: '@deepseek-ai/dsh-compaction-basic'
+
+    - id: command-compact
+      name: '@deepseek-ai/dsh-command-compact'
+
+    - id: tool-result-pruner
+      name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+      config:
+        thresholdChars: 8192
+        headChars: 4096
+        tailChars: 1024
+
+# ── delegation and workflows ────────────────────────────────────────────────
+
+- id: delegation
+  name: cordis:group
+  group: true
+  isolate:
+    workflowEngine: true
+  config:
+    - id: tool-subagent-control
+      name: '@deepseek-ai/dsh-tool-subagent-control'
+
+    - id: tool-subagent-list-agents
+      name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
+
+    - id: tool-subagent
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: spawn
+        toolName: subagent
+        modelSelectionSettings: true
+        backgroundMode: continuable
+
+    - id: tool-subagent-fork
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: fork
+        toolName: subagent_fork
+        backgroundMode: continuable
+
+    - id: tool-subagent-codex
+      name: '@deepseek-ai/dsh-tool-subagent'
+      disabled: true
+      config:
+        provider: codex
+        toolName: subagent_codex
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+
+    - id: tool-subagent-claude-code
+      name: '@deepseek-ai/dsh-tool-subagent'
+      disabled: true
+      config:
+        provider: claude-code
+        toolName: subagent_claude_code
+        backgroundMode: one-shot
+        maxDepth: provider-managed
+
+    - id: workflow-worker-thread
+      name: '@deepseek-ai/dsh-workflow-worker-thread'
+      config:
+        provider: spawn
+
+    - id: tool-workflow
+      name: '@deepseek-ai/dsh-tool-workflow'
+
+    - id: tool-ralph
+      name: '@deepseek-ai/dsh-tool-ralph'
+      config:
+        subagentProvider: spawn
+        maxRounds: 64
+
+# ── remaining model-facing rows ─────────────────────────────────────────────
+
+- id: tool-ask-user
+  name: '@deepseek-ai/dsh-tool-ask-user'
+
+- id: tool-todo
+  name: '@deepseek-ai/dsh-tool-todo'
+  config:
+    allowParallelInProgress: true
+
+- id: tool-web
+  name: '@deepseek-ai/dsh-tool-web'
+  config:
+    fetch: true
+    searchTimeoutMs: 60000
+
+- id: present
+  name: '@deepseek-ai/dsh-tool-present'
