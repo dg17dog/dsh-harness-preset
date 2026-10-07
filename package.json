@@ -1,0 +1,34 @@
+{
+  "name": "dsh-harness-preset",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "驾驭工程模式（Harness Engineering）agent preset：判型 → 三层子代理执行 → 证据验收；纯提示词工程。DeepSeek Harness 桌面端/网页端插件页直接安装。",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dg17dog/dsh-harness-preset.git"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "agent-preset",
+    "prompt-engineering",
+    "workflow"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "files": [
+    "cordis.patch.yml",
+    "skills",
+    "preset",
+    "方法论",
+    "tools",
+    "flow-panel",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ]
+}

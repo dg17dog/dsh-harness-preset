@@ -18,7 +18,7 @@
 
 ## 30 秒上手
 
-**官方桌面端（DeepSeek Harness 0.2.x，推荐）**：下载本仓库 → 桌面端「插件」→「+ 添加插件」→ 选 `desktop-bundle/` → 启用 → 新会话选「驾驭工程模式」。
+**官方桌面端（DeepSeek Harness 0.2.x，推荐）**：桌面端「插件」→「+ 添加插件」→ 安装源填本仓库地址 `https://github.com/dg17dog/dsh-harness-preset`（或 clone 后本地目录选仓库根）→ 安装并启用 → 新会话选「驾驭工程模式」。
 
 **npm 版 dsh（0.1.5.x）**：
 
@@ -111,7 +111,7 @@ Copy-Item -Recurse -Force "<仓库>\preset\harness" "$env:USERPROFILE\.dsh\.agen
 
 | 路径 | 是什么 |
 |---|---|
-| `desktop-bundle/` | **官方桌面端安装入口**（声明行 bundle：cordis.patch.yml + skills） |
+| `cordis.patch.yml` + `skills/`（仓库根） | **安装件本体**——插件页输仓库地址（或 npm 包名，发布后）即装 |
 | `preset/` | npm 版 dsh（0.1.5.x）旧世代 preset |
 | `方法论/` | L1 软件无关规范包：工作法 v2.2 + 规格/验收/探索契约三模板 |
 | `tools/` | 合规审计机检脚本 + 自测 |
@@ -125,7 +125,7 @@ Copy-Item -Recurse -Force "<仓库>\preset\harness" "$env:USERPROFILE\.dsh\.agen
 | 2026-10-01 | preset **v2.0** | 纯提示词工程版（官方桌面端适配）：工具级门禁取消，新增无面板状态纪律 |
 | 2026-09-18 | v1.0 | 首版：工作法 v2.2 挂载（npm dsh 旧世代） |
 
-- 桌面端 0.2.x 必须走 `desktop-bundle/`（旧 `.agent-presets` 目录机制已废弃）；npm web 0.1.5.x 走 `preset/`。
+- 桌面端 0.2.x 走插件页安装（仓库根即 bundle）；npm web 0.1.5.x 走 `preset/harness` 目录复制（旧 `.agent-presets` 机制）
 - 口径冲突时：冻结条款 > SKILL.md > 工作法 v2.2。
 
 ## License

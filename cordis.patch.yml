@@ -1,17 +1,8 @@
-# dsh-harness-preset — 驾驭工程模式（Harness Engineering）agent preset bundle
-# 新世代声明行格式（DeepSeek Harness 0.2.x）：一个 @deepseek-ai/dsh-agent-preset 声明，
-# 经 plugin_manager（桌面端「插件 → 添加插件」/ dsh plugin install）装入 profile 后，
-# 会话模式选择器出现「驾驭工程模式」。
-#
-# 装配原则：
-#   · 工具面与出厂 standard preset（0.2.0-rc.2）逐行同构——子代理派发（多开子代理）、
-#     终端、文件、技能、goal、plan、compaction、workflow 全套照搬；
-#   · 与 standard 的差异只有两处：①persona=驾驭工程铁律（纯提示词工作流，唯一事实源在
-#     ../harness/agent.cordis.yml，由 gen-bundle.mjs 提取）；②skill-filesystem 追加
-#     customSkillDirs 指向本 bundle 内 skills/（!!js baseUrl 随安装包解析）。
-#   · 差异登记：出厂 standard 的 tool-ralph 为 disabled，本 preset 保持一致（旧版
-#     npm-web preset 曾启用；需要时在模式编辑器里打开）。
-
+# dsh-harness-preset 根 bundle 声明（v2.0.0 起：仓库根即安装件）
+# 作用：让「插件 → 添加插件」可以直接输 GitHub 仓库地址（或 npm 包名，发布后）安装本 preset——
+# plugin_manager 把仓库整包装入 profile node_modules/dsh-harness-preset 后，
+# 本 patch 声明 preset-harness 行，skills 经 createRequire 自引用定位（与出厂 cordis preset 同构）。
+# 注意：skills 位于本包根的 skills/（desktop-bundle/ 子目录是工作区本机安装件，不进发布物）。
 - insert:
     - id: preset-harness
       name: '@deepseek-ai/dsh-agent-preset'
@@ -57,9 +48,9 @@
           - id: skill-filesystem
             name: '@deepseek-ai/dsh-skill-filesystem'
             config:
+              # 官方模式（与出厂 cordis preset 同构）：createRequire(baseUrl) 定位本包根，
+              # skills/ 在包根。直接 new URL(rel, baseUrl) 在插入行上下文不可靠（真机实证）。
               customSkillDirs:
-                # 官方模式（与出厂 cordis/创造模式 preset 同构）：createRequire(baseUrl) 定位本包，
-                # 再拼包内 skills/。直接 new URL(rel, baseUrl) 在插入行上下文不可靠（真机实证）。
                 - !!js "process.getBuiltinModule('node:path').join(process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('dsh-harness-preset/package.json')), 'skills')"
           - id: tool-skill
             name: '@deepseek-ai/dsh-tool-skill'
@@ -77,6 +68,7 @@
                 name: '@deepseek-ai/dsh-plan-mode'
                 config:
                   section: |
+
                     You are in plan mode. Stay in plan mode until exit_plan_mode succeeds or the user switches the session mode. Imperative language to implement changes means plan the implementation, not execute it. A user's conversational agreement — including an answer confirming something you asked — approves nothing and does not end plan mode; fold the confirmed decision into the plan and submit it through exit_plan_mode.
 
                     Explore first. Use non-mutating reads, searches, static analysis, and checks to ground the plan in the actual repository. Do not edit or write files, change configuration, run formatters or code generation that rewrites tracked files, commit, or otherwise carry out the plan. Prefer existing functions and patterns over new machinery.
