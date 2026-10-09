@@ -1,0 +1,36 @@
+# npm 自动发布（Trusted Publishing / OIDC——无需任何 token、无需 2FA 验证码）
+# 前置：在 npmjs.com 包设置页配置 Trusted Publisher：
+#   Organization or user: dg17dog
+#   Repository:           dsh-harness-preset
+#   Workflow filename:    publish.yml
+#   Allowed actions:      npm publish
+# 触发：GitHub 仓库 Actions 页手动 Run workflow（或发布 Release 时自动）
+# 发布内容 = 仓库根（package.json + cordis.patch.yml + skills/ …），即 npm 包本体
+name: publish
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write   # Trusted Publishing 的关键：OIDC 令牌
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      # Trusted Publishing 需要 npm CLI ≥ 11.5.1
+      - run: npm install -g npm@latest
+      - run: npm --version
+
+      # OIDC 自动交换令牌，无需 NODE_AUTH_TOKEN / NPM_TOKEN
+      - run: npm publish --access public --provenance

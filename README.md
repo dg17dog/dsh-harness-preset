@@ -8,7 +8,7 @@
 
 </div>
 
-[![版本](https://img.shields.io/badge/preset-v2.0-blue)]() [![方法论](https://img.shields.io/badge/工作法-v2.2-green)]() [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![npm](https://img.shields.io/npm/v/dsh-harness-preset)](https://www.npmjs.com/package/dsh-harness-preset) [![版本](https://img.shields.io/badge/preset-v2.0-blue)]() [![方法论](https://img.shields.io/badge/工作法-v2.2-green)]() [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > 🌏 中文为主。English edition 在路线图上（方法论术语体系较深，欢迎 PR 协助翻译）。
 
@@ -18,7 +18,7 @@
 
 ## 30 秒上手
 
-**官方桌面端（DeepSeek Harness 0.2.x，推荐）**：桌面端「插件」→「+ 添加插件」→ 安装源填本仓库地址 `https://github.com/dg17dog/dsh-harness-preset`（或 clone 后本地目录选仓库根）→ 安装并启用 → 新会话选「驾驭工程模式」。
+**官方桌面端（DeepSeek Harness 0.2.x，推荐）**：桌面端「插件」→「+ 添加插件」→ 安装源填 **npm 包名 `dsh-harness-preset`**（或本仓库地址 `https://github.com/dg17dog/dsh-harness-preset`，或 clone 后本地目录选仓库根）→ 安装并启用 → 新会话选「驾驭工程模式」。
 
 **npm 版 dsh（0.1.5.x）**：
 
@@ -30,6 +30,7 @@ Copy-Item -Recurse -Force "<仓库>\preset\harness" "$env:USERPROFILE\.dsh\.agen
 **10 秒自检**：问它"你运行在什么模式？"——应自报模式名并列出开局五问。
 **任务跑完后**：`node tools/check-workflow-compliance.mjs --cwd "你的项目工作区"`，退出码 = 违规规则数。
 
+> npm 包页：[npmjs.com/package/dsh-harness-preset](https://www.npmjs.com/package/dsh-harness-preset)｜GitHub 仓库（含完整方法论与测试物证）：[dg17dog/dsh-harness-preset](https://github.com/dg17dog/dsh-harness-preset)
 > 会话内 `subagent` / `subagent_fork` 本 preset 自带（与出厂 standard 同构）；侧边栏、智能体团队为桌面端官方自带。web 端可选装 [`flow-panel/`](flow-panel/README.md) 观测面板（纯仪表盘，不拦截，不装也完整可用）。
 
 ## 三种开局：按你的处境选
